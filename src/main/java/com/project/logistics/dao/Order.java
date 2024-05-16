@@ -1,9 +1,11 @@
 package com.project.logistics.dao;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "orders")
+@Data
 public class Order {
 
     @Id
@@ -21,6 +23,6 @@ public class Order {
     private OrderStatus orderStatus;
 
     @ManyToOne
-    @JoinColumn(name = "destination_id", nullable = false)
+    @JoinColumn(name = "destination_id")
     Destination destination;
 }

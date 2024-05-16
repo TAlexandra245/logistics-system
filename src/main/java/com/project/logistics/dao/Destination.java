@@ -1,8 +1,7 @@
 package com.project.logistics.dao;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.List;
 
@@ -10,8 +9,10 @@ import static jakarta.persistence.CascadeType.ALL;
 
 @Entity
 @Table(name = "destinations")
-@Getter
-@EqualsAndHashCode
+@NoArgsConstructor
+@Data
+@AllArgsConstructor
+@Builder
 public class Destination {
 
     @Id
@@ -26,4 +27,5 @@ public class Destination {
 
     @OneToMany(cascade = ALL, mappedBy = "destination")
     List<Order> orderList;
+
 }

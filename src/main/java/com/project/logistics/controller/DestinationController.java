@@ -1,12 +1,10 @@
 package com.project.logistics.controller;
 
 import com.project.logistics.dto.DestinationDto;
+import com.project.logistics.exceptions.CanNotCreateEntity;
 import com.project.logistics.exceptions.ResourceNotFoundException;
 import com.project.logistics.service.DestinationService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,6 +27,16 @@ public class DestinationController {
     @GetMapping("/{id}")
     public DestinationDto getDestination(@PathVariable Long id) throws ResourceNotFoundException {
         return destinationService.findById(id);
+    }
+
+    @DeleteMapping("{id}")
+    public void deleteDestination(@PathVariable Long id) throws ResourceNotFoundException {
+        destinationService.deleteDestination(id);
+    }
+
+    @PostMapping
+    public Long createDestination(@RequestBody DestinationDto destinationDto) throws CanNotCreateEntity {
+        return destinationService.createDestination(destinationDto);
     }
 
 }

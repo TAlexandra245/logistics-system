@@ -19,4 +19,16 @@ public class DestinationConverter {
                 .map(DestinationConverter::entityToDto)
                 .toList();
     }
+
+    public static Destination dtoToEntity(DestinationDto destinationDto) {
+        return Destination.builder()
+                .id(destinationDto.getId())
+                .distance(destinationDto.getDistance())
+                .name(destinationDto.getName())
+                .build();
+    }
+
+    public static List<Destination> dtoListToEntityList(List<DestinationDto> destinationDtos) {
+        return destinationDtos.stream().map(DestinationConverter::dtoToEntity).toList();
+    }
 }
