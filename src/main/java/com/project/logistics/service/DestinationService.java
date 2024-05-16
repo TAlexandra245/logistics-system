@@ -46,14 +46,15 @@ public class DestinationService {
         if(destinationDto.getId() != null) {
             throw new CanNotCreateEntity("Id should not be provided");
         }
+
         Optional<Destination> optionalDestination = destinationRepository.findDestinationByName(destinationDto.getName());
+
         if(optionalDestination.isPresent()) {
             Destination destination = optionalDestination.get();
-            throw new CanNotCreateEntity(String.format("Destination with id=%id already has name=%s", destination.getId(), destination.getName()));
+            throw new CanNotCreateEntity(String.format("Destination with id %d already has name=%s", destination.getId(), destination.getName()));
         }
 
         Destination destination = DestinationConverter.dtoToEntity(destinationDto);
-
         destinationRepository.save(destination);
 
         return destination.getId();

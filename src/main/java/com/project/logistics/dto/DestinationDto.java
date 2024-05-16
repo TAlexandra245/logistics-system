@@ -2,6 +2,9 @@ package com.project.logistics.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,6 +13,9 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DestinationDto {
     private Long id;
+    @NotBlank
     private String name;
+    @NotNull
+    @Min(0)
     private int distance;
 }

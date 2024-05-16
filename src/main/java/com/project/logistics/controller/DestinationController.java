@@ -4,6 +4,7 @@ import com.project.logistics.dto.DestinationDto;
 import com.project.logistics.exceptions.CanNotCreateEntity;
 import com.project.logistics.exceptions.ResourceNotFoundException;
 import com.project.logistics.service.DestinationService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class DestinationController {
     }
 
     @PostMapping
-    public Long createDestination(@RequestBody DestinationDto destinationDto) throws CanNotCreateEntity {
+    public Long createDestination(@RequestBody @Valid DestinationDto destinationDto) throws CanNotCreateEntity {
         return destinationService.createDestination(destinationDto);
     }
 
