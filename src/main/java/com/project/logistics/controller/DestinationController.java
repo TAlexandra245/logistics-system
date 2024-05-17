@@ -5,24 +5,22 @@ import com.project.logistics.exceptions.CanNotCreateEntity;
 import com.project.logistics.exceptions.ResourceNotFoundException;
 import com.project.logistics.service.DestinationService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/destinations")
+@RequiredArgsConstructor
 public class DestinationController {
 
     private final DestinationService destinationService;
 
-    public DestinationController(DestinationService destinationService) {
-        this.destinationService = destinationService;
-    }
-
     @GetMapping
     public List<DestinationDto> getAllDestinations() {
 
-        return  destinationService.getAllDestinations();
+        return destinationService.getAllDestinations();
     }
 
     @GetMapping("/{id}")
@@ -35,9 +33,14 @@ public class DestinationController {
         destinationService.deleteDestination(id);
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public Long createDestination(@RequestBody @Valid DestinationDto destinationDto) throws CanNotCreateEntity {
         return destinationService.createDestination(destinationDto);
+    }
+
+    @PutMapping
+    public void updateDestination(@RequestBody @Valid DestinationDto destinationDto) throws CanNotCreateEntity {
+        destinationService.updateDestination(destinationDto);
     }
 
 }

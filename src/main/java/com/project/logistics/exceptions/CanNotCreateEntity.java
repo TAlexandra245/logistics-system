@@ -5,4 +5,5 @@ public class CanNotCreateEntity extends Exception {
     public CanNotCreateEntity(String message) {
         super(message);
     }
+
 }

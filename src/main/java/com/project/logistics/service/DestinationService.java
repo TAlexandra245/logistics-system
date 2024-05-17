@@ -10,6 +10,7 @@ import com.project.logistics.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -58,5 +59,21 @@ public class DestinationService {
         destinationRepository.save(destination);
 
         return destination.getId();
+    }
+
+    public void updateDestination (DestinationDto destinationDto) throws CanNotCreateEntity{
+        if(destinationDto.getId() == null) {
+            throw new CanNotCreateEntity("Id should be provided");
+        }
+
+        Optional<Destination> optionalDestination = destinationRepository.findDestinationByName(destinationDto.getName());
+        if(optionalDestination.isPresent()) {
+            Destination destination = optionalDestination.get();
+            if(!Objects.equals(destination.getId(), destinationDto.getId())){
+                throw new CanNotCreateEntity(String.format("Destination with id %d already has name %s", destination.getId(), destination.getName()));
+            }
+        }
+        Destination destination = DestinationConverter.dtoToEntity(destinationDto);
+        destinationRepository.save(destination);
     }
 }
