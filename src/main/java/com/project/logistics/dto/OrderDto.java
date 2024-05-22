@@ -1,6 +1,6 @@
 package com.project.logistics.dto;
 
-import jakarta.validation.constraints.NotNull;
+import com.project.logistics.dao.OrderStatus;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,9 +8,13 @@ import lombok.Data;
 @Builder
 public class OrderDto {
 
-    @NotNull
+    private Long id;
+
     private Long deliveryDate;
 
-    @NotNull
+    private Long lastUpdated;
+
+    private OrderStatus orderStatus;
+
     private Long destinationId;
 }

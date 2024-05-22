@@ -34,7 +34,7 @@ public class DestinationController {
     }
 
     @PostMapping("/add")
-    public Long createDestination(@RequestBody @Valid DestinationDto destinationDto) throws CanNotCreateEntity {
+    public String createDestination(@RequestBody @Valid DestinationDto destinationDto) throws CanNotCreateEntity {
         return destinationService.createDestination(destinationDto);
     }
 

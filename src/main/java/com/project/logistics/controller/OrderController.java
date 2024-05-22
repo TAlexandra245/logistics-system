@@ -1,15 +1,12 @@
 package com.project.logistics.controller;
 
-import com.project.logistics.dao.Order;
+import com.project.logistics.dto.AddOrderDto;
 import com.project.logistics.dto.OrderDto;
 import com.project.logistics.exceptions.CanNotCreateEntity;
 import com.project.logistics.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,7 +18,17 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/add")
-    public void addOrders(@RequestBody @Valid List<OrderDto> orderDtos) throws CanNotCreateEntity {
-        orderService.addOrders(orderDtos);
+    public List<OrderDto> addOrders(@RequestBody @Valid List<AddOrderDto> addOrderDtos) throws CanNotCreateEntity {
+        return orderService.addOrders(addOrderDtos);
+    }
+
+    @PutMapping ("/cancel")
+    public void cancelOrders(@RequestBody List<Long> orderIds) {
+       orderService.cancelOrders(orderIds);
+    }
+
+    @GetMapping("/status")
+    public List<OrderDto> getOrders(@RequestParam(name = "date", required = false) String dateAsString, @RequestParam(name = "destination", required = false, defaultValue = "") String destinationQueryParam) {
+        return orderService.getOrders(dateAsString, destinationQueryParam);
     }
 }
