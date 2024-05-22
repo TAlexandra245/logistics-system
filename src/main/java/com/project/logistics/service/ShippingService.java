@@ -26,6 +26,9 @@ public class ShippingService {
 
         List<Order> ordersForToday = orderRepository.findAllByDeliveryDate(companyInfo.getCurrentDateAsLong());
 
+        for(Order order : ordersForToday) {
+
+        }
         Map<Destination, List<Order>> ordersByDestination = orderRepository.findAllByDeliveryDate(companyInfo.getCurrentDateAsLong())
                 .stream()
                 .collect(Collectors.groupingBy(Order::getDestination));

@@ -48,9 +48,7 @@ public class OrderService {
 
         List<Order> foundOrders = orderRepository.findAllById(orderIds);
         for (Order foundOrder : foundOrders) {
-            if (foundOrder.getOrderStatus() != OrderStatus.DELIVERED) {
-                foundOrder.setOrderStatus(OrderStatus.CANCELED);
-            }
+            orderRepository.changeOrderState(foundOrder, OrderStatus.CANCELED);
         }
 
         orderRepository.saveAll(foundOrders);
@@ -60,7 +58,7 @@ public class OrderService {
 
         Long dateAsLong = companyInfo.getCurrentDateAsLong();
 
-        if(!dateAsString.isBlank()) {
+        if (!dateAsString.isBlank()) {
             dateAsLong = companyInfo.getLocalDateAsStringLong(dateAsString);
         }
 

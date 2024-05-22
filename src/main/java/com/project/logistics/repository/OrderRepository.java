@@ -17,10 +17,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findAllByDeliveryDate(Long deliveryDate);
 
 
-
     default void archiveOrder(Order order) {
         order.setDestination(null);
-        order.setOrderStatus(OrderStatus.ARCHIVED);
+        this.changeOrderState(order, OrderStatus.ARCHIVED);
+    }
+
+    default void changeOrderState(Order order, OrderStatus newStatus) {
+        OrderStatus initialStatus = order.getOrderStatus();
+
+        if (OrderStatus.allowedTransitions.get(initialStatus).contains(newStatus)) {
+            order.setOrderStatus(newStatus);
+        }
+
         this.save(order);
     }
 }
