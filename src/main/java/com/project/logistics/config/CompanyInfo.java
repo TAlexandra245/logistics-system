@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 
 @Component
 @Getter
@@ -23,6 +25,10 @@ public class CompanyInfo {
     public Long getLocalDateAsStringLong(String dateString) {
         LocalDate localDate = LocalDate.parse(dateString, dateTimeFormatter);
         return localDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000;
+    }
+
+    public void advanceDate() {
+        currentDate = currentDate.plusDays(1);
     }
 
 }
