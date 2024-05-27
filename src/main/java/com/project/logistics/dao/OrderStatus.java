@@ -1,9 +1,6 @@
 package com.project.logistics.dao;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public enum OrderStatus {
 
@@ -14,7 +11,7 @@ public enum OrderStatus {
     CANCELED;
 
 
-    public static Map<OrderStatus, List<OrderStatus>> allowedTransitions;
+    public static final Map<OrderStatus, List<OrderStatus>> allowedTransitions = new HashMap<>();
 
     static {
         allowedTransitions.put(NEW, List.of(DELIVERING, CANCELED, ARCHIVED));

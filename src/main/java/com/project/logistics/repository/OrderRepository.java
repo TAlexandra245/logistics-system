@@ -20,6 +20,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     default void archiveOrder(Order order) {
         order.setDestination(null);
         this.changeOrderState(order, OrderStatus.ARCHIVED);
+        this.save(order);
     }
 
     default void changeOrderState(Order order, OrderStatus newStatus) {
@@ -28,7 +29,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         if (OrderStatus.allowedTransitions.get(initialStatus).contains(newStatus)) {
             order.setOrderStatus(newStatus);
         }
-
-        this.save(order);
     }
 }

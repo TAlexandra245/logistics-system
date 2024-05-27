@@ -14,6 +14,6 @@ public class ShippingController {
     private final ShippingService shippingService;
     @PostMapping("/new-day")
     public String advanceDate() {
-        return null;
+       return shippingService.advanceDate();
     }
 }
