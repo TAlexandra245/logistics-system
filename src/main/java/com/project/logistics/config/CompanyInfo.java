@@ -34,5 +34,4 @@ public class CompanyInfo {
     public Long calculateCompanyProfit(Long profit) {
         return companyProfit.addAndGet(profit);
     }
-
 }

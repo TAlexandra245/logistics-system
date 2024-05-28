@@ -23,22 +23,19 @@ public class ShippingManager {
 
     @SneakyThrows
     @Async("executor")
-    public void deliverToDestination(Destination destination, List<Order> orderList) {
+    public void deliverToDestination(Destination destination, List<Long> orderIds) {
 
         log.info(String.format("Started delivering to  %s  on %s for %d km",
                 destination.getName(), Thread.currentThread().getName(), destination.getDistance()));
 
-        orderList.forEach(order -> orderRepository.changeOrderState(order, OrderStatus.DELIVERED));
-
-        orderRepository.saveAll(orderList);
-
         Thread.sleep(destination.getDistance() * 1000);
 
-        int numberOfDeliveries = orderList.size();
 
-        log.info(String.format("%d deliveries completed for %s", orderList.size(), destination.getName()));
+        int noOfDeliveredOrders = orderRepository.updateStatusForOrders(orderIds,OrderStatus.DELIVERING, OrderStatus.DELIVERED);
 
-        long profit = companyInfo.calculateCompanyProfit((long) numberOfDeliveries * destination.getDistance());
+        log.info(String.format("%d deliveries completed for %s", noOfDeliveredOrders, destination.getName()));
+
+        long profit = companyInfo.calculateCompanyProfit((long) noOfDeliveredOrders * destination.getDistance());
 
         log.info("Company profit is " + profit);
     }

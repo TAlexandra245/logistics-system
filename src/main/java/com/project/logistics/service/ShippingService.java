@@ -10,10 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +27,6 @@ public class ShippingService {
 
     private final CompanyInfo companyInfo;
     private final OrderRepository orderRepository;
-    private final ExecutorService executorService;
     private final ShippingManager shippingManager;
 
     public String advanceDate() {
@@ -31,26 +34,23 @@ public class ShippingService {
         LocalDate currentDate = companyInfo.advanceDate();
         log.info("New Day starting: " + currentDate);
 
-        List<Order> ordersForToday = orderRepository.findAllByDeliveryDate(companyInfo.getCurrentDateAsLong());
-
-        for (Order order : ordersForToday) {
-            orderRepository.changeOrderState(order, OrderStatus.DELIVERING);
-        }
-
-        orderRepository.saveAll(ordersForToday);
-
-
-        Map<Destination, List<Order>> ordersByDestination = orderRepository.findAllByDeliveryDate(companyInfo.getCurrentDateAsLong())
+        Map<Destination, List<Long>> ordersByDestinationId = orderRepository.findAllByDeliveryDate(companyInfo.getCurrentDateAsLong())
                 .stream()
-                .collect(Collectors.groupingBy(Order::getDestination));
+                .filter(order -> order.getOrderStatus() == OrderStatus.NEW)
+                .collect(Collectors.groupingBy(Order::getDestination, Collectors.mapping(Order::getId, Collectors.toList())));
 
-        String destinationName = ordersByDestination.keySet().stream().map(Destination::getName).collect(Collectors.joining(", "));
+        List<Long> orderIds = ordersByDestinationId.values().stream().flatMap(java.util.Collection::stream).toList();
+
+        orderRepository.updateStatusForOrders(orderIds, null, OrderStatus.DELIVERING);
+
+        String destinationName = ordersByDestinationId.keySet()
+                .stream()
+                .map(Destination::getName)
+                .collect(Collectors.joining(", "));
 
         log.info("Today we will be delivering to " + destinationName);
 
-        for (Map.Entry<Destination, List<Order>> entry : ordersByDestination.entrySet()) {
-//            DeliveryTask deliveryTask = new DeliveryTask(entry.getKey(), entry.getValue());
-//            executorService.submit(deliveryTask);
+        for (Map.Entry<Destination, List<Long>> entry : ordersByDestinationId.entrySet()) {
             shippingManager.deliverToDestination(entry.getKey(), entry.getValue());
         }
         return String.format("Today we will be delivering to %s", destinationName);

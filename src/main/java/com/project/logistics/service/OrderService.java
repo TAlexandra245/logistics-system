@@ -46,12 +46,8 @@ public class OrderService {
 
     public void cancelOrders(List<Long> orderIds) {
 
-        List<Order> foundOrders = orderRepository.findAllById(orderIds);
-        for (Order foundOrder : foundOrders) {
-            orderRepository.changeOrderState(foundOrder, OrderStatus.CANCELED);
-        }
+        orderRepository.updateStatusForOrders(orderIds, null, OrderStatus.CANCELED);
 
-        orderRepository.saveAll(foundOrders);
     }
 
     public List<OrderDto> getOrders(String dateAsString, String destination) {
