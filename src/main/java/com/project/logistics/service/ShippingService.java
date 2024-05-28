@@ -1,13 +1,10 @@
 package com.project.logistics.service;
 
-import com.project.logistics.config.AsyncConfig;
 import com.project.logistics.config.CompanyInfo;
 import com.project.logistics.dao.Destination;
 import com.project.logistics.dao.Order;
 import com.project.logistics.dao.OrderStatus;
-import com.project.logistics.repository.DestinationRepository;
 import com.project.logistics.repository.OrderRepository;
-import com.project.logistics.service.runnable.DeliveryTask;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,10 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,8 +23,8 @@ public class ShippingService {
 
     private final CompanyInfo companyInfo;
     private final OrderRepository orderRepository;
-    private final DestinationRepository destinationRepository;
     private final ExecutorService executorService;
+    private final ShippingManager shippingManager;
 
     public String advanceDate() {
 
@@ -55,11 +49,11 @@ public class ShippingService {
         log.info("Today we will be delivering to " + destinationName);
 
         for (Map.Entry<Destination, List<Order>> entry : ordersByDestination.entrySet()) {
-            DeliveryTask deliveryTask = new DeliveryTask(entry.getKey(), entry.getValue());
-
-            //TODO SUBMIT TASK
-            executorService.submit(deliveryTask);
+//            DeliveryTask deliveryTask = new DeliveryTask(entry.getKey(), entry.getValue());
+//            executorService.submit(deliveryTask);
+            shippingManager.deliverToDestination(entry.getKey(), entry.getValue());
         }
-        return null;
+        return String.format("Today we will be delivering to %s", destinationName);
     }
+
 }
