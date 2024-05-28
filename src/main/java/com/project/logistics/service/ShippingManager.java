@@ -2,7 +2,6 @@ package com.project.logistics.service;
 
 import com.project.logistics.config.CompanyInfo;
 import com.project.logistics.dao.Destination;
-import com.project.logistics.dao.Order;
 import com.project.logistics.dao.OrderStatus;
 import com.project.logistics.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
