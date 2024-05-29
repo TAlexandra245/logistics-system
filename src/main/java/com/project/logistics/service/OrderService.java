@@ -45,15 +45,12 @@ public class OrderService {
     }
 
     public void cancelOrders(List<Long> orderIds) {
-
-        orderRepository.updateStatusForOrders(orderIds, null, OrderStatus.CANCELED);
-
+        orderRepository.updateStatusForOrders(orderIds, OrderStatus.DELIVERING, OrderStatus.CANCELED);
     }
 
     public List<OrderDto> getOrders(String dateAsString, String destination) {
 
         Long dateAsLong = companyInfo.getCurrentDateAsLong();
-
         if (!dateAsString.isBlank()) {
             dateAsLong = companyInfo.getLocalDateAsStringLong(dateAsString);
         }

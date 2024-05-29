@@ -1,5 +1,6 @@
 package com.project.logistics.service;
 
+import com.project.logistics.cache.DestinationCache;
 import com.project.logistics.dao.Destination;
 import com.project.logistics.dto.DestinationConverter;
 import com.project.logistics.dto.DestinationDto;
@@ -8,6 +9,9 @@ import com.project.logistics.exceptions.ResourceNotFoundException;
 import com.project.logistics.repository.DestinationRepository;
 import com.project.logistics.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,23 +25,25 @@ public class DestinationService {
     private final DestinationRepository destinationRepository;
     private final OrderRepository orderRepository;
 
+    private final DestinationCache destinationCache;
+
     public List<DestinationDto> getAllDestinations() {
         List<Destination> destinationList = destinationRepository.findAll();
         return DestinationConverter.entityListToDtoList(destinationList);
     }
 
     public DestinationDto findById(Long id) throws ResourceNotFoundException {
-        Destination destination = destinationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Destination not found"));
+        Destination destination = destinationCache.findById(id).orElseThrow(() -> new ResourceNotFoundException("Destination not found"));
         return DestinationConverter.entityToDto(destination);
     }
 
+    @CacheEvict("destinations")
     public void deleteDestination(Long id) throws ResourceNotFoundException {
-        Destination destination = destinationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Destination not found"));
+        Destination destination = destinationCache.findById(id).orElseThrow(() -> new ResourceNotFoundException("Destination not found"));
         orderRepository.findAllByDestinationId(id).forEach(orderRepository::archiveOrder);
 
         destinationRepository.delete(destination);
+        destinationCache.delete(destination);
     }
 
     public String createDestination(DestinationDto destinationDto) throws CanNotCreateEntity {
@@ -45,7 +51,7 @@ public class DestinationService {
             throw new CanNotCreateEntity("Id should not be provided");
         }
 
-        Optional<Destination> optionalDestination = destinationRepository.findDestinationByName(destinationDto.getName());
+        Optional<Destination> optionalDestination = destinationCache.findByName(destinationDto.getName());
 
         if (optionalDestination.isPresent()) {
             Destination destination = optionalDestination.get();
@@ -54,16 +60,18 @@ public class DestinationService {
 
         Destination destination = DestinationConverter.dtoToEntity(destinationDto);
         destinationRepository.save(destination);
+        destinationCache.put(destination);
 
         return String.format("Entity with id %d has been created successfully", destination.getId());
     }
 
-    public void updateDestination(DestinationDto destinationDto) throws CanNotCreateEntity {
+    @CachePut(value = "destinations", key = "#destinationDto.id")
+    public DestinationDto updateDestination(DestinationDto destinationDto) throws CanNotCreateEntity {
         if (destinationDto.getId() == null) {
             throw new CanNotCreateEntity("Id should be provided");
         }
 
-        Optional<Destination> optionalDestination = destinationRepository.findDestinationByName(destinationDto.getName());
+        Optional<Destination> optionalDestination = destinationCache.findByName(destinationDto.getName());
         if (optionalDestination.isPresent()) {
             Destination destination = optionalDestination.get();
             if (!Objects.equals(destination.getId(), destinationDto.getId())) {
@@ -72,6 +80,9 @@ public class DestinationService {
         }
 
         Destination destination = DestinationConverter.dtoToEntity(destinationDto);
-        destinationRepository.save(destination);
+        Destination saved = destinationRepository.save(destination);
+        destinationCache.put(saved);
+        return DestinationConverter.entityToDto(saved);
+
     }
 }
