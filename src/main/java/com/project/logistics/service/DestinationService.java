@@ -8,15 +8,9 @@ import com.project.logistics.exceptions.CanNotCreateEntity;
 import com.project.logistics.exceptions.ResourceNotFoundException;
 import com.project.logistics.repository.DestinationRepository;
 import com.project.logistics.repository.OrderRepository;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +23,6 @@ public class DestinationService {
 
     private final DestinationRepository destinationRepository;
     private final OrderRepository orderRepository;
-
     private final DestinationCache destinationCache;
 
     public List<DestinationDto> getAllDestinations() {
@@ -38,13 +31,13 @@ public class DestinationService {
     }
 
     public DestinationDto findById(Long id) throws ResourceNotFoundException {
-        Destination destination = destinationCache.findById(id).orElseThrow(() -> new ResourceNotFoundException("Destination not found"));
+        Destination destination = destinationCache.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Destination not found for id %d", id)));
         return DestinationConverter.entityToDto(destination);
     }
 
     @CacheEvict("destinations")
     public void deleteDestination(Long id) throws ResourceNotFoundException {
-        Destination destination = destinationCache.findById(id).orElseThrow(() -> new ResourceNotFoundException("Destination not found"));
+        Destination destination = destinationCache.findById(id).orElseThrow(() -> new ResourceNotFoundException("Destination not found for id " + id));
         orderRepository.findAllByDestinationId(id).forEach(orderRepository::archiveOrder);
 
         destinationRepository.delete(destination);

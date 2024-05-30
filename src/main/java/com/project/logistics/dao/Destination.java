@@ -28,7 +28,7 @@ public class Destination {
     @Column(nullable = false)
     private Integer distance;
 
-    @OneToMany(cascade = ALL, mappedBy = "destination")
-    List<Order> orderList;
+//    @OneToMany(cascade = ALL, mappedBy = "destination")
+//    List<Order> orderList;
 
 }
