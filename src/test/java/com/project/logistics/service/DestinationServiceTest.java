@@ -7,12 +7,8 @@ import com.project.logistics.exceptions.CanNotCreateEntity;
 import com.project.logistics.exceptions.ResourceNotFoundException;
 import com.project.logistics.repository.DestinationRepository;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 //@SpringBootTest(classes = {DestinationRepository.class, DestinationCache.class, OrderService.class})
@@ -31,26 +26,21 @@ class DestinationServiceTest {
     @Autowired
     DestinationService destinationService;
 
-    @Mock
+    @Autowired
     DestinationRepository destinationRepository;
 
     @Mock
     DestinationCache destinationCache;
-    DestinationDto destinationDto;
+    DestinationDto destinationDto = DestinationDto.builder()
+            .name("Ploiesti")
+            .distance(20)
+            .build();
 
-    Destination destination;
-
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        destinationDto = new DestinationDto();
-        destinationDto.setName("Galati");
-        destinationDto.setDistance(20);
-
-        destination = new Destination(1L, "Ploiesti", 20);
-
-    }
+    Destination destination = Destination.builder()
+            .id(1L)
+            .name("Ploiesti")
+            .distance(20)
+            .build();
 
     @Test
     public void testDeleteById_NotFound() {
@@ -65,27 +55,27 @@ class DestinationServiceTest {
         assertEquals("Destination not found for id " + idToDelete, resourceNotFoundException.getMessage());
     }
 
-    @Order(2)
     @Test
     public void testDeleteById_Ok() throws ResourceNotFoundException {
         //given
         Long idToDelete = destinationService.getAllDestinations().stream().mapToLong(DestinationDto::getId).findAny().orElseThrow();
 
-        Optional<Destination> destinationToBeFound = destinationRepository.findById(idToDelete);
-        assertTrue(destinationToBeFound.isPresent());
-
+        Optional<Destination> foundDestination = destinationRepository.findById(idToDelete);
+        assertTrue(foundDestination.isPresent());
         //when
         destinationService.deleteDestination(idToDelete);
 
         //then
-        Optional<Destination> foundDestination = destinationRepository.findById(idToDelete);
-        assertTrue(foundDestination.isEmpty());
+        foundDestination = destinationRepository.findById(idToDelete);
+        assertFalse(foundDestination.isPresent());
 
     }
 
     @Test
     public void testCreateDestination_AlreadyExists() {
-        when(destinationCache.findByName(anyString())).thenReturn(Optional.of(destination));
+        String destinationName = "Ploiesti";
+
+        when(destinationCache.findByName(destinationName)).thenReturn(Optional.of(destination));
 
         CanNotCreateEntity canNotCreateEntity = assertThrows(CanNotCreateEntity.class, () -> destinationService.createDestination(destinationDto));
 
@@ -103,10 +93,15 @@ class DestinationServiceTest {
 
     @Test
     public void testCreateDestination_Ok() throws CanNotCreateEntity {
-        when(destinationCache.findByName(anyString())).thenReturn(Optional.empty());
-        when(destinationRepository.save(ArgumentMatchers.any(Destination.class))).thenReturn(destination);
+        DestinationDto newDestination = DestinationDto.builder()
+                .name("Galati")
+                .distance(433)
+                .build();
 
-        String message = destinationService.createDestination(destinationDto);
+        when(destinationCache.findByName(newDestination.getName())).thenReturn(Optional.empty());
+
+
+        String message = destinationService.createDestination(newDestination);
 
         assertEquals("Entity with id 11 has been created successfully", message);
     }

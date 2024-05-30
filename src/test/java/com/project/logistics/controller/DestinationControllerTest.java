@@ -39,7 +39,7 @@ class DestinationControllerTest {
     }
 
     @Test
-    public void testGetDestinationById() throws Exception {
+    public void testGetDestinationById_Ok() throws Exception {
 
         //given
         Long id = 1L;
