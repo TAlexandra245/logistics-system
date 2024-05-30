@@ -3,27 +3,20 @@ package com.project.logistics.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.logistics.dto.DestinationDto;
 import com.project.logistics.exceptions.ResourceNotFoundException;
-import com.project.logistics.repository.DestinationRepository;
 import com.project.logistics.service.DestinationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @WebMvcTest(DestinationController.class)
@@ -36,11 +29,9 @@ class DestinationControllerTest {
     private DestinationService destinationService;
 
     private DestinationDto destinationDto;
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     public void setUp() {
-        objectMapper = new ObjectMapper();
         destinationDto = new DestinationDto();
         destinationDto.setId(1L);
         destinationDto.setName("Ploiesti");

@@ -22,7 +22,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import org.mockito.MockitoAnnotations;
 
 //@SpringBootTest(classes = {DestinationRepository.class, DestinationCache.class, OrderService.class})
 @SpringBootTest
